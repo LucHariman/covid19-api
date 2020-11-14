@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
-import { Region } from "./region.entity";
+import { Region } from "../regions/region.entity";
 
 @Entity()
 export class DailyReport {

@@ -7,7 +7,7 @@ import * as stream from 'stream';
 import { Repository } from "typeorm";
 import { DailyReport } from "./daily-report.entity";
 import { GitFileHash } from "./git-file-hash.entity";
-import { Region } from "./region.entity";
+import { Region } from "../regions/region.entity";
 
 const API_GITHUB_BASE_URL = 'https://api.github.com';
 const CSSE_REPOSITORY_URI = 'CSSEGISandData/COVID-19';
@@ -83,6 +83,8 @@ export class DataImportConsole {
       region.state = content['Province_State'];
       region.region = content['Country_Region'];
       region.population = +content['Population'];
+      region.lat = content['Lat'] && parseFloat(content['Lat']) || null;
+      region.lng = content['Long_'] && parseFloat(content['Long_']) || null;
       return region;
     });
     await this.regionsRepository.save(regions);

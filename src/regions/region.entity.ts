@@ -25,4 +25,10 @@ export class Region {
 
   @Column()
   population: number;
+
+  @Column('float8', { nullable: true })
+  lat: number;
+
+  @Column('float8', { nullable: true })
+  lng: number;
 }
