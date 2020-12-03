@@ -2,8 +2,8 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Type } from 'class-transformer';
-import { IsEnum, IsIn, IsNumber, IsOptional, Min } from 'class-validator';
-import { Repository } from 'typeorm';
+import { IsIn, IsNumber, IsOptional, Min } from 'class-validator';
+import { FindConditions, ILike, Like, Repository } from 'typeorm';
 import { Region } from './region.entity';
 
 const ALLOWED_SORT_VALUE = [ 'uid', 'combinedKey', 'admin2', 'state', 'region', 'iso2', 'iso3', 'population' ];
@@ -30,9 +30,13 @@ class ListQuery {
   sortBy?: string;
 
   @ApiPropertyOptional({ enum: ALLOWED_ORDER_VALUE })
-  @IsEnum(ALLOWED_ORDER_VALUE)
+  @IsIn(ALLOWED_ORDER_VALUE)
   @IsOptional()
   orderBy?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  q?: string;
 }
 
 class ListResult {
@@ -59,7 +63,7 @@ export class RegionsController {
 
   @Get()
   @ApiOkResponse({ type: ListResult })
-  async get(@Query() { page, itemsPerPage, sortBy, orderBy }: ListQuery): Promise<ListResult> {
+  async get(@Query() { page, itemsPerPage, sortBy, orderBy, q }: ListQuery): Promise<ListResult> {
     page = page || 1;
     itemsPerPage = itemsPerPage || 30;
     sortBy = sortBy || 'uid';
@@ -68,7 +72,14 @@ export class RegionsController {
     const order = {};
     order[sortBy] = orderBy;
 
+    const where: FindConditions<Region>[] = [];
+    if (q) {
+      q += '%';
+      where.push({ state: ILike(q) }, { region: ILike(q) });
+    }
+
     const [ entries, totalItems ] = await this.regionsRepository.findAndCount({
+      where,
       order,
       skip: (page - 1) * itemsPerPage,
       take: itemsPerPage
