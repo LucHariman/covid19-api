@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Type } from 'class-transformer';
@@ -86,5 +86,15 @@ export class RegionsController {
     });
 
     return { page, itemsPerPage, totalItems, entries };
+  }
+
+  @Get(':uid')
+  @ApiOkResponse({ type: Region })
+  async getOne(@Param('uid', ParseIntPipe) uid: number): Promise<Region> {
+    const region = await this.regionsRepository.findOne({ uid });
+    if (!region) {
+      throw new NotFoundException('Region not found!');
+    }
+    return region;
   }
 }
