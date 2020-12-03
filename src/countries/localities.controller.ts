@@ -3,8 +3,8 @@ import { ApiOkResponse, ApiProperty, ApiPropertyOptional, ApiTags } from '@nestj
 import { InjectRepository } from '@nestjs/typeorm';
 import { Type } from 'class-transformer';
 import { IsIn, IsNumber, IsOptional, Min } from 'class-validator';
-import { FindConditions, ILike, Like, Repository } from 'typeorm';
-import { Region } from './region.entity';
+import { FindConditions, ILike, Repository } from 'typeorm';
+import { Locality } from './locality.entity';
 
 const ALLOWED_SORT_VALUE = [ 'uid', 'combinedKey', 'admin2', 'state', 'region', 'iso2', 'iso3', 'population' ];
 const ALLOWED_ORDER_VALUE = [ 'asc', 'desc' ];
@@ -49,16 +49,16 @@ class ListResult {
   @ApiProperty()
   totalItems: number;
 
-  @ApiProperty({ type: [Region] })
-  entries: Region[];
+  @ApiProperty({ type: [Locality] })
+  entries: Locality[];
 }
 
-@ApiTags('Regions')
-@Controller('regions')
-export class RegionsController {
+@ApiTags('Countries')
+@Controller('localities')
+export class LocalitiesController {
   constructor(
-    @InjectRepository(Region)
-    private regionsRepository: Repository<Region>
+    @InjectRepository(Locality)
+    private localitiesRepository: Repository<Locality>
   ) {}
 
   @Get()
@@ -72,13 +72,13 @@ export class RegionsController {
     const order = {};
     order[sortBy] = orderBy;
 
-    const where: FindConditions<Region>[] = [];
+    const where: FindConditions<Locality>[] = [];
     if (q) {
       q += '%';
       where.push({ state: ILike(q) }, { region: ILike(q) });
     }
 
-    const [ entries, totalItems ] = await this.regionsRepository.findAndCount({
+    const [ entries, totalItems ] = await this.localitiesRepository.findAndCount({
       where,
       order,
       skip: (page - 1) * itemsPerPage,
@@ -89,12 +89,12 @@ export class RegionsController {
   }
 
   @Get(':uid')
-  @ApiOkResponse({ type: Region })
-  async getOne(@Param('uid', ParseIntPipe) uid: number): Promise<Region> {
-    const region = await this.regionsRepository.findOne({ uid });
-    if (!region) {
-      throw new NotFoundException('Region not found!');
+  @ApiOkResponse({ type: Locality })
+  async getOne(@Param('uid', ParseIntPipe) uid: number): Promise<Locality> {
+    const locality = await this.localitiesRepository.findOne({ uid });
+    if (!locality) {
+      throw new NotFoundException('Locality not found!');
     }
-    return region;
+    return locality;
   }
 }

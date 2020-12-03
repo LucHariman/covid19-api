@@ -7,19 +7,19 @@ import * as stream from 'stream';
 import { Repository } from "typeorm";
 import { DailyReport } from "./daily-report.entity";
 import { GitFileHash } from "./git-file-hash.entity";
-import { Region } from "../regions/region.entity";
+import { Locality } from "../countries/locality.entity";
 
 const API_GITHUB_BASE_URL = 'https://api.github.com';
 const CSSE_REPOSITORY_URI = 'CSSEGISandData/COVID-19';
 const DATA_FOLDER = 'csse_covid_19_data';
-const REGIONS_CSV_PATH = `${DATA_FOLDER}/UID_ISO_FIPS_LookUp_Table.csv`;
+const LOCALITIES_CSV_PATH = `${DATA_FOLDER}/UID_ISO_FIPS_LookUp_Table.csv`;
 const DAILY_REPORT_FOLDER_PATH = `${DATA_FOLDER}/csse_covid_19_daily_reports`;
 
 @Console()
 export class DataImportConsole {
   constructor(
-    @InjectRepository(Region)
-    private regionsRepository: Repository<Region>,
+    @InjectRepository(Locality)
+    private localitiesRepository: Repository<Locality>,
     @InjectRepository(DailyReport)
     private dailyReportsRepository: Repository<DailyReport>,
     @InjectRepository(GitFileHash)
@@ -35,19 +35,19 @@ export class DataImportConsole {
 
     spin.start(`Updating data`);
     const dataFolderDetails = await this.getFileDetails(DATA_FOLDER);
-    const fileDetails = dataFolderDetails.find(e => e.path === REGIONS_CSV_PATH);
+    const fileDetails = dataFolderDetails.find(e => e.path === LOCALITIES_CSV_PATH);
     const gitFileHash = await this.gitFileHashesRepository.findOne({ fileUri: fileDetails.path });
     if (!(gitFileHash && gitFileHash.hash === fileDetails.sha)) {
-      await this.updateRegionList();
-      await this.gitFileHashesRepository.save({ fileUri: REGIONS_CSV_PATH, hash: fileDetails.sha });
-      spin.info('Regions updated');
+      await this.updateLocalityList();
+      await this.gitFileHashesRepository.save({ fileUri: LOCALITIES_CSV_PATH, hash: fileDetails.sha });
+      spin.info('Localities updated');
     }
 
     spin.text = 'Updating daily report';
-    const regionsMap = new Map();
-    const regions = await this.regionsRepository.find();
-    for (const region of regions) {
-      regionsMap.set(region.combinedKey, region.uid);
+    const localitiesMap = new Map();
+    const localities = await this.localitiesRepository.find();
+    for (const locality of localities) {
+      localitiesMap.set(locality.combinedKey, locality.uid);
     }
     const dailyReportsFolderDetails = await this.getFileDetails(DAILY_REPORT_FOLDER_PATH);
     for (const fileDetails of dailyReportsFolderDetails) {
@@ -61,7 +61,7 @@ export class DataImportConsole {
         continue;
       }
       try {
-        await this.updateDailyReport(regionsMap, new Date(`${year}-${month}-${day}`));
+        await this.updateDailyReport(localitiesMap, new Date(`${year}-${month}-${day}`));
       } catch (error) {
         console.error(error.message);
         continue;
@@ -72,22 +72,22 @@ export class DataImportConsole {
     spin.succeed('Data updated');
   }
 
-  private async updateRegionList() {
-    const regions = await this.parseRemoteCSVFile<Region>(REGIONS_CSV_PATH, content => {
-      const region = new Region();
-      region.uid = +content['UID'];
-      region.combinedKey = content['Combined_Key'];
-      region.iso2 = content['iso2'];
-      region.iso3 = content['iso3'];
-      region.admin2 = content['Admin2'];
-      region.state = content['Province_State'];
-      region.region = content['Country_Region'];
-      region.population = +content['Population'];
-      region.lat = content['Lat'] && parseFloat(content['Lat']) || null;
-      region.lng = content['Long_'] && parseFloat(content['Long_']) || null;
-      return region;
+  private async updateLocalityList() {
+    const localities = await this.parseRemoteCSVFile<Locality>(LOCALITIES_CSV_PATH, content => {
+      const locality = new Locality();
+      locality.uid = +content['UID'];
+      locality.combinedKey = content['Combined_Key'];
+      locality.iso2 = content['iso2'];
+      locality.iso3 = content['iso3'];
+      locality.admin2 = content['Admin2'];
+      locality.state = content['Province_State'];
+      locality.region = content['Country_Region'];
+      locality.population = +content['Population'];
+      locality.lat = content['Lat'] && parseFloat(content['Lat']) || null;
+      locality.lng = content['Long_'] && parseFloat(content['Long_']) || null;
+      return locality;
     });
-    await this.regionsRepository.save(regions);
+    await this.localitiesRepository.save(localities);
   }
 
   private async getFileDetails(directoryUri: string) {
@@ -95,19 +95,19 @@ export class DataImportConsole {
     return response.data as any[];
   }
 
-  private async updateDailyReport(regionsMap: Map<string, number>, day: Date) {
+  private async updateDailyReport(localitiesMap: Map<string, number>, day: Date) {
     const dayKey = Math.floor(day.getTime() / 1e3);
     const reports = await this.parseRemoteCSVFile<DailyReport>(
       `${DAILY_REPORT_FOLDER_PATH}/${moment(day).format('MM-DD-YYYY')}.csv`,
       content => {
-        const regionUid = regionsMap.get(content['Combined_Key']);
-        if (!regionUid) {
+        const localityUid = localitiesMap.get(content['Combined_Key']);
+        if (!localityUid) {
           return null;
         }
         const m = moment.utc(content['Last_Update'], true);
         const report = new DailyReport();
         report.day = dayKey;
-        report.regionUid = regionUid;
+        report.localityUid = localityUid;
         report.confirmed = parseInt(content['Confirmed']) || null;
         report.deaths = parseInt(content['Deaths']) || null;
         report.recovered = parseInt(content['Recovered']) || null;

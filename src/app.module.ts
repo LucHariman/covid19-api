@@ -3,14 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConsoleModule } from 'nestjs-console';
 import { AppService } from './app.service';
 import { DataImportModule } from './data-import/data-import.module';
-import { RegionsModule } from './regions/regions.module';
+import { CountriesModule } from './countries/countries.module';
 
 @Module({
   imports: [
     ConsoleModule,
     TypeOrmModule.forRoot(),
     DataImportModule,
-    RegionsModule,
+    CountriesModule,
   ],
   providers: [AppService],
 })

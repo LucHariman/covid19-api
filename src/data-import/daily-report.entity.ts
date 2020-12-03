@@ -1,16 +1,16 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
-import { Region } from "../regions/region.entity";
+import { Locality } from "../countries/locality.entity";
 
 @Entity()
 export class DailyReport {
   @PrimaryColumn()
   day: number;
 
-  @ManyToOne(() => Region)
-  region: Region;
+  @ManyToOne(() => Locality)
+  locality: Locality;
 
   @PrimaryColumn()
-  regionUid: number;
+  localityUid: number;
 
   @Column({ nullable: true })
   confirmed: number;

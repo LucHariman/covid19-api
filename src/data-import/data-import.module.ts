@@ -3,10 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DailyReport } from './daily-report.entity';
 import { DataImportConsole } from './data-import.console';
 import { GitFileHash } from './git-file-hash.entity';
-import { Region } from '../regions/region.entity';
+import { Locality } from '../countries/locality.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Region, DailyReport, GitFileHash])],
+  imports: [TypeOrmModule.forFeature([Locality, DailyReport, GitFileHash])],
   providers: [DataImportConsole],
   exports: [DataImportConsole]
 })

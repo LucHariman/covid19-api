@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
-export class Region {
+export class Locality {
   @ApiProperty()
   @PrimaryColumn()
   uid: number;
