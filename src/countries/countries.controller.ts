@@ -1,5 +1,5 @@
-import { Controller, Get } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Controller, Get, NotFoundException, Param } from "@nestjs/common";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Connection, EntityManager } from "typeorm";
 import { Country } from "./country.entity";
 
@@ -17,6 +17,17 @@ export class CountriesController {
   @Get()
   get() {
     return this.entityManager.find(Country);
+  }
+
+  @Get(':code')
+  @ApiOkResponse({ type: Country })
+  async getOne(@Param('code') code: string): Promise<Country> {
+    code = code.toUpperCase();
+    const country = await this.entityManager.findOne(Country, { where: [ { iso2: code }, { iso3: code } ] });
+    if (!country) {
+      throw new NotFoundException('Country not found!');
+    }
+    return country;
   }
 
 }

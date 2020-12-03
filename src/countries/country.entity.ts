@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Connection, ViewColumn, ViewEntity } from 'typeorm';
 import { Locality } from './locality.entity';
 
@@ -12,12 +13,15 @@ import { Locality } from './locality.entity';
     .groupBy('locality.iso2, locality.iso3, locality.region')
 })
 export class Country {
+  @ApiProperty()
   @ViewColumn()
   iso2: string;
 
+  @ApiProperty()
   @ViewColumn()
   iso3: string;
 
+  @ApiProperty()
   @ViewColumn()
   name: string;
 }
