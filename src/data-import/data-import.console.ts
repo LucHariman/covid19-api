@@ -36,8 +36,11 @@ export class DataImportConsole {
     spin.start(`Updating data`);
     const dataFolderDetails = await this.getFileDetails(DATA_FOLDER);
     const fileDetails = dataFolderDetails.find(e => e.path === LOCALITIES_CSV_PATH);
-    const gitFileHash = await this.gitFileHashesRepository.findOne({ fileUri: fileDetails.path });
-    if (!(gitFileHash && gitFileHash.hash === fileDetails.sha)) {
+    const gitFileHash = await this.gitFileHashesRepository.findOne({
+      fileUri: fileDetails.path,
+      hash: fileDetails.sha
+    });
+    if (!gitFileHash) {
       await this.updateLocalityList();
       await this.gitFileHashesRepository.save({ fileUri: LOCALITIES_CSV_PATH, hash: fileDetails.sha });
       spin.info('Localities updated');
@@ -56,8 +59,11 @@ export class DataImportConsole {
         continue;
       }
       const [, month, day, year] = m;
-      const gitFileHash = await this.gitFileHashesRepository.findOne({ fileUri: fileDetails.path });
-      if (gitFileHash && gitFileHash.hash === fileDetails.sha) {
+      const gitFileHash = await this.gitFileHashesRepository.findOne({
+        fileUri: fileDetails.path,
+        hash: fileDetails.sha
+      });
+      if (gitFileHash) {
         continue;
       }
       try {
@@ -102,18 +108,16 @@ export class DataImportConsole {
       content => {
         const localityUid = localitiesMap.get(content['Combined_Key']);
         if (!localityUid) {
+          console.warn('Locality UID not found!', content)
           return null;
         }
         const m = moment.utc(content['Last_Update'], true);
         const report = new DailyReport();
         report.day = dayKey;
         report.localityUid = localityUid;
-        report.confirmed = parseInt(content['Confirmed']) || null;
-        report.deaths = parseInt(content['Deaths']) || null;
-        report.recovered = parseInt(content['Recovered']) || null;
-        report.active = content['Active'] && parseInt(content['Active']) || null;
-        report.incidenceRate = content['Incidence_Rate'] && parseFloat(content['Incidence_Rate']) || null;
-        report.caseFatalityRatio = content['Case-Fatality_Ratio'] && parseFloat(content['Case-Fatality_Ratio']) || null;
+        report.confirmed = parseInt(content['Confirmed']) || 0;
+        report.deaths = parseInt(content['Deaths']) || 0;
+        report.recovered = parseInt(content['Recovered']) || 0;
         return report;
       }
     );

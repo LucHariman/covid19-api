@@ -12,21 +12,24 @@ export class DailyReport {
   @PrimaryColumn()
   localityUid: number;
 
-  @Column({ nullable: true })
+  @Column({ default: 0 })
   confirmed: number;
 
-  @Column({ nullable: true })
+  @Column({ default: 0 })
   deaths: number;
 
-  @Column({ nullable: true })
+  @Column({ default: 0 })
   recovered: number;
 
-  @Column({ nullable: true })
-  active: number;
+  // Removed since it is equal to confirmed - deaths - recovered
+  // @Column({ nullable: true })
+  // active: number;
 
-  @Column('float8', { nullable: true })
-  incidenceRate: number;
+  // Removed since it is equal to 100000 * confirmed / population
+  // @Column('float8', { nullable: true })
+  // incidenceRate: number;
 
-  @Column('float8', { nullable: true })
-  caseFatalityRatio: number;
+  // Removed since it is equal to 100 * death / confirmed
+  // @Column('float8', { nullable: true })
+  // caseFatalityRatio: number;
 }

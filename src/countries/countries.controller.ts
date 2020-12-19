@@ -8,9 +8,7 @@ import { Country } from "./country.entity";
 export class CountriesController {
   private readonly entityManager: EntityManager;
 
-  constructor(
-    connection: Connection
-  ) {
+  constructor(connection: Connection) {
     this.entityManager = connection.manager;
   }
 
