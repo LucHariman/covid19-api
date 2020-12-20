@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api')
     .useGlobalPipes(new ValidationPipe({ transform: true }))
-    .useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+    .useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector), { excludePrefixes: [ '_' ] }));
   const apiDocsOptions = new DocumentBuilder()
     .setTitle('COVID-19 API')
     .setDescription(packageJson.description)

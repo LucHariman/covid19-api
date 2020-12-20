@@ -26,13 +26,16 @@ export class Country {
   @ViewColumn()
   name: string;
 
-  @Exclude()
-  @ViewColumn({ name: 'population' })
-  populationStr: string;
+  private _population: number;
 
   @ApiProperty()
   @Expose()
+  @ViewColumn()
   get population() {
-    return +this.populationStr;
+    return this._population;
+  }
+
+  set population(value: any) {
+    this._population = +value;
   }
 }
