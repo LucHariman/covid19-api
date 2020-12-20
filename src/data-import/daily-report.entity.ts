@@ -20,16 +20,4 @@ export class DailyReport {
 
   @Column({ default: 0 })
   recovered: number;
-
-  // Removed since it is equal to confirmed - deaths - recovered
-  // @Column({ nullable: true })
-  // active: number;
-
-  // Removed since it is equal to 100000 * confirmed / population
-  // @Column('float8', { nullable: true })
-  // incidenceRate: number;
-
-  // Removed since it is equal to 100 * death / confirmed
-  // @Column('float8', { nullable: true })
-  // caseFatalityRatio: number;
 }

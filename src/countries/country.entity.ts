@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import { Connection, ViewColumn, ViewEntity } from 'typeorm';
 import { Locality } from './locality.entity';
 
