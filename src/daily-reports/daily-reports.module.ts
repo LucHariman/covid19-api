@@ -10,4 +10,4 @@ import { Locality } from '../countries/locality.entity';
   providers: [DataImportConsole],
   exports: [DataImportConsole]
 })
-export class DataImportModule {}
+export class DailyReportsModule {}
