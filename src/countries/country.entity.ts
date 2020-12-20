@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude, Expose } from 'class-transformer';
 import { Connection, ViewColumn, ViewEntity } from 'typeorm';
 import { Locality } from './locality.entity';
 
@@ -24,4 +25,14 @@ export class Country {
   @ApiProperty()
   @ViewColumn()
   name: string;
+
+  @Exclude()
+  @ViewColumn({ name: 'population' })
+  populationStr: string;
+
+  @ApiProperty()
+  @Expose()
+  get population() {
+    return +this.populationStr;
+  }
 }

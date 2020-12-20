@@ -13,6 +13,7 @@ export class CountriesController {
   }
 
   @Get()
+  @ApiOkResponse({ type: [Country] })
   get() {
     return this.entityManager.find(Country);
   }
