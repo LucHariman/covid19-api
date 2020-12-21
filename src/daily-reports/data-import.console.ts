@@ -102,7 +102,6 @@ export class DataImportConsole {
   }
 
   private async updateDailyReport(localitiesMap: Map<string, number>, day: Date) {
-    const dayKey = Math.floor(day.getTime() / 1e3);
     const reports = await this.parseRemoteCSVFile<DailyReport>(
       `${DAILY_REPORT_FOLDER_PATH}/${moment(day).format('MM-DD-YYYY')}.csv`,
       content => {
@@ -113,7 +112,7 @@ export class DataImportConsole {
         }
         const m = moment.utc(content['Last_Update'], true);
         const report = new DailyReport();
-        report.day = dayKey;
+        report.day = day;
         report.localityUid = localityUid;
         report.confirmed = parseInt(content['Confirmed']) || 0;
         report.deaths = parseInt(content['Deaths']) || 0;
@@ -121,7 +120,7 @@ export class DataImportConsole {
         return report;
       }
     );
-    await this.dailyReportsRepository.delete({ day: dayKey });
+    await this.dailyReportsRepository.delete({ day });
     await this.dailyReportsRepository.save(reports);
   }
 

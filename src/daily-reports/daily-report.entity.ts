@@ -3,8 +3,8 @@ import { Locality } from "../countries/locality.entity";
 
 @Entity()
 export class DailyReport {
-  @PrimaryColumn()
-  day: number;
+  @PrimaryColumn({ type: 'date' })
+  day: Date;
 
   @ManyToOne(() => Locality)
   locality: Locality;
