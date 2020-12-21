@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
-import { Connection, ViewColumn, ViewEntity } from 'typeorm';
+import { AfterLoad, Connection, ViewColumn, ViewEntity } from 'typeorm';
 import { Locality } from './locality.entity';
 
 @ViewEntity({
@@ -26,16 +25,12 @@ export class Country {
   @ViewColumn()
   name: string;
 
-  private _population: number;
-
   @ApiProperty()
-  @Expose()
   @ViewColumn()
-  get population() {
-    return this._population;
-  }
+  population: number;
 
-  set population(value: any) {
-    this._population = +value;
+  @AfterLoad()
+  afterLoad() {
+    this.population = +this.population;
   }
 }

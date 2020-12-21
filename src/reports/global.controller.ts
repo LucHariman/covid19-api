@@ -66,4 +66,10 @@ export class GlobalReportController {
     .addSelect('sum(dailyReport.recovered)', 'recovered')
     .groupBy('dailyReport.day');
   }
+
+  /**
+   * TODO: Methods:
+   * - GET /country/iso3
+   * - GET /locality/uid
+   */
 }

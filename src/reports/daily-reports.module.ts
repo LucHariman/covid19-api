@@ -12,4 +12,4 @@ import { GlobalReportController } from './global.controller';
   exports: [DataImportConsole],
   controllers: [GlobalReportController]
 })
-export class DailyReportsModule {}
+export class ReportsModule {}
