@@ -33,7 +33,7 @@ class GlobalReport {
 
 @ApiTags('Reports')
 @Controller('reports/global')
-export class GlobalReportController {
+export class GlobalReportsController {
   constructor(
     @InjectRepository(DailyReport)
     private dailyReportsRepository: Repository<DailyReport>
@@ -66,10 +66,4 @@ export class GlobalReportController {
     .addSelect('sum(dailyReport.recovered)', 'recovered')
     .groupBy('dailyReport.day');
   }
-
-  /**
-   * TODO: Methods:
-   * - GET /country/iso3
-   * - GET /locality/uid
-   */
 }
